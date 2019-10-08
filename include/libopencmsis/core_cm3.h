@@ -145,7 +145,7 @@ typedef struct {
 	uint32_t VAL;
 	uint32_t CALIB;
 } SysTick_TypeDef;
-#define SysTick ((SysTick_TypeDef *) SYS_TICK_BASE)
+#define SysTick ((volatile SysTick_TypeDef *) SYS_TICK_BASE)
 
 static inline uint32_t SysTick_Config(uint32_t n_ticks)
 {
