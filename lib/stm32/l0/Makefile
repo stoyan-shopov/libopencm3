@@ -21,7 +21,7 @@ LIBNAME		= libopencm3_stm32l0
 SRCLIBDIR	?= ../..
 
 CC		= clang --target=arm-none-eabi -mcpu=cortex-m0 -I../../../arm-none-eabi/include/
-AR		= $(PREFIX)ar
+AR		= ar
 TGT_CFLAGS	= -Os \
 		  -Wall -Wextra -Wimplicit-function-declaration \
 		  -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes \
