@@ -1,15 +1,16 @@
-/** @defgroup mmap_defines Memory Map
+/** @defgroup dma_defines DMA Defines
  *
- * @brief <b>Defined Constants for the SWM050 Memory Map</b>
+ * @ingroup STM32G0xx_defines
  *
- * @ingroup SWM050_defines
+ * @brief Defined Constants and Types for the STM32G0xx DMA Controller
+ *
+ * @version 1.0.0
  *
  * LGPL License Terms @ref lgpl_license
  */
+
 /*
  * This file is part of the libopencm3 project.
- *
- * Copyright (C) 2019 Icenowy Zheng <icenowy@aosc.io>
  *
  * This library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -24,23 +25,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**@{*/
-#ifndef LIBOPENCM3_MEMORYMAP_H
-#define LIBOPENCM3_MEMORYMAP_H
-#include <libopencm3/cm3/memorymap.h>
 
-/* Memory map for all buses */
-/** @defgroup memory_map Memory Map for All Buses
-@{*/
-#define PERIPH_BASE			(0x40000000U)
+#ifndef LIBOPENCM3_DMA_H
+#define LIBOPENCM3_DMA_H
 
-#define SYSTEM_CON_BASE			(PERIPH_BASE + 0x0)
-#define GPIO_BASE			(PERIPH_BASE + 0x1000)
-#define TIMER_SE0_BASE			(PERIPH_BASE + 0x2000)
-#define TIMER_SE1_BASE			(PERIPH_BASE + 0x2400)
-#define WDT_BASE			(PERIPH_BASE + 0x19000)
-#define SYSCTL_BASE			(PERIPH_BASE + 0xf0000)
-/*@}*/
+#include <libopencm3/stm32/common/dma_common_l1f013.h>
 
 #endif
-/**@}*/

@@ -44,7 +44,7 @@
 /**@{*/
 
 #include <libopencm3/cm3/nvic.h>
-#include <libopencm3/cm3/scs.h>
+#include <libopencm3/cm3/scb.h>
 
 /*---------------------------------------------------------------------------*/
 /** @brief NVIC Enable Interrupt
@@ -156,10 +156,27 @@ void nvic_set_priority(uint8_t irqn, uint8_t priority)
 	 * handling would mean signed integers. */
 	if (irqn >= NVIC_IRQ_COUNT) {
 		/* Cortex-M  system interrupts */
-		SCS_SHPR((irqn & 0xF) - 4) = priority;
+#if defined(__ARM_ARCH_6M__)
+		/* ARM6M supports only 32bit word access to SHPR registers */
+		irqn = (irqn & 0xF) - 4;
+		uint8_t shift = (irqn & 0x3) << 3;
+		uint8_t reg = irqn >> 2;
+		SCB_SHPR32(reg) = ((SCB_SHPR32(reg) & ~(0xFFUL << shift)) |
+				((uint32_t) priority) << shift);
+#else
+		SCB_SHPR((irqn & 0xF) - 4) = priority;
+#endif
 	} else {
 		/* Device specific interrupts */
+#if defined(__ARM_ARCH_6M__)
+		/* ARM6M supports only 32bit word access to IPR registers */
+		uint8_t shift = (irqn & 0x3) << 3;
+		uint8_t reg = irqn >> 2;
+		NVIC_IPR32(reg) = ((NVIC_IPR32(reg) & ~(0xFFUL << shift)) |
+				((uint32_t) priority) << shift);
+#else
 		NVIC_IPR(irqn) = priority;
+#endif
 	}
 }
 
