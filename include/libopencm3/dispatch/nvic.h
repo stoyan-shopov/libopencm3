@@ -78,6 +78,9 @@
 #elif defined(SWM050)
 #       include <libopencm3/swm050/nvic.h>
 
+#elif defined(GENERIC_CORTEXM)
+#       include <libopencm3/generic-cortexm/nvic.h>
+
 #else
 #	warning"no interrupts defined for chipset; NVIC_IRQ_COUNT = 0"
 

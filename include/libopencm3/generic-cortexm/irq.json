@@ -1,0 +1,8 @@
+{
+    "irqs": [
+        "generic_cortexm_interrupt"
+    ],
+    "partname_humanreadable": "Generic Cortex-M device",
+    "partname_doxygen": "GENERIC-CORTEXM",
+    "includeguard": "LIBOPENCM3_GENERIC_CORTEXM_NVIC_H"
+}
