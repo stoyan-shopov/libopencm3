@@ -74,6 +74,9 @@
 #elif defined(SWM050)
 #       include "../swm050/vector_nvic.c"
 
+#elif defined(NRF51)
+#       include "../nrf51/vector_nvic.c"
+
 #else
 #	warning "no interrupts defined for chipset;"\
 	"not allocating space in the vector table"

@@ -78,6 +78,9 @@
 #elif defined(SWM050)
 #       include <libopencm3/swm050/nvic.h>
 
+#elif defined(NRF51)
+#       include <libopencm3/nrf51/nvic.h>
+
 #else
 #	warning"no interrupts defined for chipset; NVIC_IRQ_COUNT = 0"
 
