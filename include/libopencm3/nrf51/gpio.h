@@ -1,6 +1,8 @@
 #ifndef LIBOPENCM3_NRF51_GPIO_H
 #define LIBOPENCM3_NRF51_GPIO_H
 
+#include <libopencm3/cm3/common.h>
+
 /* NRF51 gpio register addresses */
 enum
 {
@@ -30,44 +32,7 @@ enum
 #define GPIO_DIR	MMIO32(GPIO_BASE_ADDRESS + GPIO_DIR_REG_OFFSET)
 #define GPIO_DIRSET	MMIO32(GPIO_BASE_ADDRESS + GPIO_DIRSET_REG_OFFSET)
 #define GPIO_DIRCLR	MMIO32(GPIO_BASE_ADDRESS + GPIO_DIRCLR_REG_OFFSET)
-#define GPIO_PIN_CNF	MMIO32(GPIO_BASE_ADDRESS + GPIO_PIN_CNF_REG_OFFSET)
-
-/* gpio numbers */
-enum
-{
-	GPIO0	=	1 << 0,
-	GPIO1	=	1 << 1,
-	GPIO2	=	1 << 2,
-	GPIO3	=	1 << 3,
-	GPIO4	=	1 << 4,
-	GPIO5	=	1 << 5,
-	GPIO6	=	1 << 6,
-	GPIO7	=	1 << 7,
-	GPIO8	=	1 << 8,
-	GPIO9	=	1 << 9,
-	GPIO10	=	1 << 10,
-	GPIO11	=	1 << 11,
-	GPIO12	=	1 << 12,
-	GPIO13	=	1 << 13,
-	GPIO14	=	1 << 14,
-	GPIO15	=	1 << 15,
-	GPIO16	=	1 << 16,
-	GPIO17	=	1 << 17,
-	GPIO18	=	1 << 18,
-	GPIO19	=	1 << 19,
-	GPIO20	=	1 << 20,
-	GPIO21	=	1 << 21,
-	GPIO22	=	1 << 22,
-	GPIO23	=	1 << 23,
-	GPIO24	=	1 << 24,
-	GPIO25	=	1 << 25,
-	GPIO26	=	1 << 26,
-	GPIO27	=	1 << 27,
-	GPIO28	=	1 << 28,
-	GPIO29	=	1 << 29,
-	GPIO30	=	1 << 30,
-	GPIO31	=	1 << 31,
-};
+#define GPIO_PIN_CNF	(&MMIO32(GPIO_BASE_ADDRESS + GPIO_PIN_CNF_REG_OFFSET))
 
 enum PIN_CNF_ENUM
 {
@@ -94,5 +59,15 @@ enum PIN_CNF_ENUM
 	PIN_CNF_SENSE_HIGH		= 1,
 	PIN_CNF_SENSE_LOW		= 3,
 };
+
+void gpio_configure(unsigned gpio_number, enum PIN_CNF_ENUM direction, enum PIN_CNF_ENUM input_connection_config,
+		enum PIN_CNF_ENUM pull_configuration, enum PIN_CNF_ENUM drive_configuration,
+		enum PIN_CNF_ENUM sense_configuration);
+void gpio_set(unsigned gpio_number);
+void gpio_clear(unsigned gpio_number);
+unsigned gpio_read(unsigned gpio_number);
+uint32_t gpio_read_all_gpios(void);
+void gpio_write(unsigned gpio_number, unsigned value);
+void gpio_write_all_gpios(uint32_t value);
 
 #endif /* LIBOPENCM3_NRF51_GPIO_H */
