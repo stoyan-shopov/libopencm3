@@ -17,12 +17,12 @@ enum
 	/* PIN_CNF below is an array, there are 32 registers,
 	 * one for each pin */
 	GPIO_PIN_CNF_REG_OFFSET	= 0x700,
-	/* PIN_CNF bitfield offsets */
-	GPIO_PIN_CNF_DIR_OFFSET		= 0,
-	GPIO_PIN_CNF_INPUT_OFFSET	= 1,
-	GPIO_PIN_CNF_PULL_OFFSET	= 2,
-	GPIO_PIN_CNF_DRIVE_OFFSET	= 8,
-	GPIO_PIN_CNF_SENSE_OFFSET	= 16,
+		/* PIN_CNF bitfield offsets (offset in bits in the PIN_CNF register) */
+		GPIO_PIN_CNF_DIR_OFFSET		= 0,
+		GPIO_PIN_CNF_INPUT_OFFSET	= 1,
+		GPIO_PIN_CNF_PULL_OFFSET	= 2,
+		GPIO_PIN_CNF_DRIVE_OFFSET	= 8,
+		GPIO_PIN_CNF_SENSE_OFFSET	= 16,
 };
 
 #define GPIO_OUT	MMIO32(GPIO_BASE_ADDRESS + GPIO_OUT_REG_OFFSET)
