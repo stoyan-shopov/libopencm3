@@ -116,6 +116,14 @@
 #define OTG_GAHBCFG_PTXFELVL		0x0100
 
 /* OTG USB configuration register (OTG_GUSBCFG) */
+
+
+#define OTG_GUSBCFG_TSDPS		(1 << 22)
+#define OTG_GUSBCFG_ULPIFSLS		(1 << 17)
+#define OTG_GUSBCFG_ULPIEVBUSD		(1 << 20)
+#define OTG_GUSBCFG_ULPIEVBUSI		(1 << 21)
+#define OTG_GUSBCFG_ULPISEL		(1 << 4)
+
 #define OTG_GUSBCFG_TOCAL		0x00000003
 #define OTG_GUSBCFG_SRPCAP		0x00000100
 #define OTG_GUSBCFG_HNPCAP		0x00000200
@@ -220,6 +228,9 @@
 #define OTG_GRXSTSP_EPNUM_MASK		(0xf << 0)
 
 /* Bits 31:22 - Reserved */
+
+/* ??? This bit is present in the st header files, but I could not find it described in the documentation. */
+#define OTG_GCCFG_PHYHSEN	(1 << 23)
 /** Only on cores < 0x2000 */
 #define OTG_GCCFG_NOVBUSSENS	(1 << 21)
 /** Only on cores >= 0x2000 */
