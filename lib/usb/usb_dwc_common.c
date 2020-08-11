@@ -126,9 +126,11 @@ void dwc_ep_setup(usbd_device *usbd_dev, uint8_t addr, uint8_t type,
 	if (!dir) {
 		usbd_dev->doeptsiz[addr] = OTG_DIEPSIZ0_PKTCNT |
 				 (max_size & OTG_DIEPSIZ0_XFRSIZ_MASK);
+		/*
 		REBASE(OTG_DOEPTSIZ(addr)) = usbd_dev->doeptsiz[addr];
-		REBASE(OTG_DOEPCTL(addr)) |= OTG_DOEPCTL0_EPENA |
-		    OTG_DOEPCTL0_USBAEP | OTG_DIEPCTL0_CNAK |
+				 */
+		REBASE(OTG_DOEPCTL(addr)) |= /*OTG_DOEPCTL0_EPENA |*/
+		    OTG_DOEPCTL0_USBAEP | OTG_DIEPCTL0_SNAK |
 		    OTG_DOEPCTLX_SD0PID | (type << 18) | max_size;
 
 		if (callback) {
@@ -442,14 +444,21 @@ void dwc_poll(usbd_device *usbd_dev)
 					if (usbd_dev->user_callback_ctr[epnum][USB_TRANSACTION_OUT]) {
 						usbd_dev->user_callback_ctr[epnum][USB_TRANSACTION_OUT] (usbd_dev, epnum);
 					}
-					REBASE(OTG_DOEPTSIZ(epnum)) = usbd_dev->doeptsiz[epnum];
-					REBASE(OTG_DOEPCTL(epnum)) |= OTG_DOEPCTL0_EPENA |
+					if (epnum == 0)
+					{
+						/* Special case for control endpoint 0 - reception of OUT packets is
+						 * always enabled. */
+						REBASE(OTG_DOEPTSIZ(epnum)) = usbd_dev->doeptsiz[epnum];
+						REBASE(OTG_DOEPCTL(epnum)) |= OTG_DOEPCTL0_EPENA |
 
-						(usbd_dev->force_nak[epnum] ?
-						 OTG_DOEPCTL0_SNAK : OTG_DOEPCTL0_CNAK);
+							(usbd_dev->force_nak[epnum] ?
+							 OTG_DOEPCTL0_SNAK : OTG_DOEPCTL0_CNAK);
+					}
 				}
 				if (t & (1 << 3) /* stup */)
 				{
+					/* Special case for control endpoints - reception of OUT packets is
+					 * always enabled. */
 					REBASE(OTG_DOEPINT(epnum)) = (1 << 3);
 					if (usbd_dev->user_callback_ctr[epnum][USB_TRANSACTION_SETUP]) {
 						usbd_dev->user_callback_ctr[epnum][USB_TRANSACTION_SETUP] (usbd_dev, epnum);
@@ -478,4 +487,16 @@ void dwc_disconnect(usbd_device *usbd_dev, bool disconnected)
 	} else {
 		REBASE(OTG_DCTL) &= ~OTG_DCTL_SDIS;
 	}
+}
+
+void accept_out_packets_on_endpoint(usbd_device * usbd_dev, int epnum)
+{
+	if (epnum & 0x80)
+		/* Ignore IN endpoints. Strictly speaking, this is a bug. */
+		return;
+	REBASE(OTG_DOEPTSIZ(epnum)) = usbd_dev->doeptsiz[epnum];
+	REBASE(OTG_DOEPCTL(epnum)) |= OTG_DOEPCTL0_EPENA |
+
+		(usbd_dev->force_nak[epnum] ?
+		 OTG_DOEPCTL0_SNAK : OTG_DOEPCTL0_CNAK);
 }

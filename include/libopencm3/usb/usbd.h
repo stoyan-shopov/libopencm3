@@ -233,6 +233,9 @@ extern uint8_t usbd_ep_stall_get(usbd_device *usbd_dev, uint8_t addr);
  */
 extern void usbd_ep_nak_set(usbd_device *usbd_dev, uint8_t addr, uint8_t nak);
 
+/* TODO: this does not belong here! */
+void accept_out_packets_on_endpoint(usbd_device * usbd_dev, int epnum);
+
 END_DECLS
 
 #endif
