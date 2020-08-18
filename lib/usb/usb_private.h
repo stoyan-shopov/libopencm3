@@ -43,6 +43,11 @@ LGPL License Terms @ref lgpl_license
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
+enum
+{
+	USB_ENDPOINT_COUNT	= 9,
+};
+
 /** Internal collection of device information. */
 struct _usbd_device {
 	const struct usb_device_descriptor *desc;
@@ -83,7 +88,7 @@ struct _usbd_device {
 		uint8_t type_mask;
 	} user_control_callback[MAX_USER_CONTROL_CALLBACK];
 
-	usbd_endpoint_callback user_callback_ctr[8][3];
+	usbd_endpoint_callback user_callback_ctr[USB_ENDPOINT_COUNT][3];
 
 	/* User callback function for some standard USB function hooks */
 	usbd_set_config_callback user_callback_set_config[MAX_USER_SET_CONFIG_CALLBACK];

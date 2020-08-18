@@ -34,7 +34,6 @@
 /* TODO: this does not belong here; maybe add it as a new field in the driver structure */
 enum
 {
-	ENDPOINT_COUNT		= 9,
 	MAX_BULK_PACKET_SIZE	= 512,
 };
 
@@ -54,7 +53,7 @@ static struct incoming_packet
 	bool	is_packet_present;
 	int	packet_length;
 	uint8_t	packet_data[MAX_BULK_PACKET_SIZE];
-} stashed_packets[ENDPOINT_COUNT];
+} stashed_packets[USB_ENDPOINT_COUNT];
 
 void dwc_set_address(usbd_device *usbd_dev, uint8_t addr)
 {
@@ -147,7 +146,7 @@ void dwc_endpoints_reset(usbd_device *usbd_dev)
 	usbd_dev->fifo_mem_top = usbd_dev->fifo_mem_top_ep0;
 
 	/* Disable any currently active endpoints */
-	for (i = 1; i < ENDPOINT_COUNT; i++) {
+	for (i = 1; i < USB_ENDPOINT_COUNT; i++) {
 		if (REBASE(OTG_DOEPCTL(i)) & OTG_DOEPCTL0_EPENA) {
 			REBASE(OTG_DOEPCTL(i)) |= OTG_DOEPCTL0_EPDIS;
 		}
@@ -231,15 +230,33 @@ uint16_t dwc_ep_write_packet(usbd_device *usbd_dev, uint8_t addr,
 	addr &= 0x7F;
 
 	/* Return if endpoint is already enabled. */
-	if (REBASE(OTG_DIEPTSIZ(addr)) & OTG_DIEPSIZ0_PKTCNT) {
-		//while(1);
-		return 0;
-	}
-	while ((OTG_DTXFSTS(addr) & 0xffff) < ((len + 3) >> 2))
-		;
+	if (REBASE(OTG_DIEPCTL(addr)) & OTG_DIEPCTL0_EPENA)
+		return 0xffff;
+	if (REBASE(OTG_DTXFSTS(addr) & 0xffff) < ((len + 3) >> 2))
+		return 0xffff;
 
 	/* Enable endpoint for transmission. */
 	REBASE(OTG_DIEPTSIZ(addr)) = OTG_DIEPSIZ0_PKTCNT | len;
+
+	/* WARNING: it is not explicitly stated in the ST documentation,
+	 * but the usb core fifo memory read/write accesses should not
+	 * be interrupted by usb core fifo memory write/read accesses.
+	 *
+	 * For example, this function can be run from within the usb interrupt
+	 * context, and also from outside of the usb interrupt context.
+	 * When this function executes outside of the usb interrupt context,
+	 * if it gets interrupted by the usb interrupt while it writes to
+	 * the usb core fifo memory, and from within the usb
+	 * interrupt the usb core fifo memory is read, then when control returns
+	 * to this function, the usb core fifo memory write accesses can not
+	 * simply continue, this will result in a transaction error on the
+	 * usb line.
+	 *
+	 * In order to avoid such situation, the usb interrupt is masked here
+	 * prior to writing the data to the usb core fifo memory.
+	 */
+	uint32_t saved_interrupt_mask = REBASE(OTG_GINTMSK);
+	REBASE(OTG_GINTMSK) = 0;
 	REBASE(OTG_DIEPCTL(addr)) |= OTG_DIEPCTL0_EPENA |
 				     OTG_DIEPCTL0_CNAK;
 
@@ -266,6 +283,7 @@ uint16_t dwc_ep_write_packet(usbd_device *usbd_dev, uint8_t addr,
 	}
 #endif /* defined(__ARM_ARCH_6M__) */
 
+	REBASE(OTG_GINTMSK) = saved_interrupt_mask;
 	return len;
 }
 
@@ -362,14 +380,17 @@ void dwc_poll(usbd_device *usbd_dev)
 	 * There is no global interrupt flag for transmit complete.
 	 * The XFRC bit must be checked in each OTG_DIEPINT(x).
 	 */
-	for (i = 0; i < ENDPOINT_COUNT; i++) { /* Iterate over endpoints. */
-		if (REBASE(OTG_DIEPINT(i)) & OTG_DIEPINTX_XFRC) {
-			/* Transfer complete. */
-			REBASE(OTG_DIEPINT(i)) = OTG_DIEPINTX_XFRC;
-			if (usbd_dev->user_callback_ctr[i]
-						       [USB_TRANSACTION_IN]) {
-				usbd_dev->user_callback_ctr[i]
-					[USB_TRANSACTION_IN](usbd_dev, i);
+	if (intsts & OTG_GINTSTS_IEPINT)
+	{
+		for (i = 0; i < USB_ENDPOINT_COUNT; i++) { /* Iterate over endpoints. */
+			if (REBASE(OTG_DIEPINT(i)) & OTG_DIEPINTX_XFRC) {
+				/* Transfer complete. */
+				REBASE(OTG_DIEPINT(i)) = OTG_DIEPINTX_XFRC;
+				if (usbd_dev->user_callback_ctr[i]
+						[USB_TRANSACTION_IN]) {
+					usbd_dev->user_callback_ctr[i]
+						[USB_TRANSACTION_IN](usbd_dev, i);
+				}
 			}
 		}
 	}
@@ -432,7 +453,7 @@ void dwc_poll(usbd_device *usbd_dev)
 	{
 		uint32_t daint = REBASE(OTG_DAINT);
 		int epnum;
-		for (epnum = 0; epnum < ENDPOINT_COUNT; epnum ++)
+		for (epnum = 0; epnum < USB_ENDPOINT_COUNT; epnum ++)
 			if (daint & (1 << (16 + epnum)))
 			{
 				uint32_t t = REBASE(OTG_DOEPINT(epnum));
