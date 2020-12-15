@@ -1,22 +1,9 @@
-/** @defgroup timer_defines Timer Defines
-
-@brief <b>libopencm3 Defined Constants and Types for the STM32F1xx Timers</b>
-
-@ingroup STM32F1xx_defines
-
-@version 1.0.0
-
-@date 8 March 2013
-
-@author @htmlonly &copy; @endhtmlonly 2011 Fergus Noble <fergusnoble@gmail.com>
-
-LGPL License Terms @ref lgpl_license
-*/
+/** @addtogroup opamp_file OPAMP peripheral API
+ * @ingroup peripheral_apis
+ */
 
 /*
  * This file is part of the libopencm3 project.
- *
- * Copyright (C) 2011 Fergus Noble <fergusnoble@gmail.com>
  *
  * This library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -32,22 +19,34 @@ LGPL License Terms @ref lgpl_license
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/**@{*/
 
-#include <libopencm3/stm32/common/timer_common_all.h>
+#include <libopencm3/stm32/opamp.h>
 
-/** Input Capture input polarity */
-enum tim_ic_pol {
-	TIM_IC_RISING,
-	TIM_IC_FALLING,
-};
+bool opamp_read_calout(uint32_t base)
+{
+	return (OPAMP_CSR(base) >> OPAMP_CSR_CALOUT_SHIFT) &
+			OPAMP_CSR_CALOUT_MASK;
+}
 
-/* --- Function prototypes ------------------------------------------------- */
+void opamp_high_speed_mode_enable(uint32_t base)
+{
+	OPAMP_CSR(base) |= OPAMP_CSR_OPAHSM;
+}
 
-BEGIN_DECLS
+void opamp_high_speed_mode_disable(uint32_t base)
+{
+	OPAMP_CSR(base) &= ~OPAMP_CSR_OPAHSM;
+}
 
-void timer_ic_set_polarity(uint32_t timer,
-			   enum tim_ic_id ic,
-			   enum tim_ic_pol pol);
+void opamp_output_set_internal(uint32_t base)
+{
+	OPAMP_CSR(base) |= OPAMP_CSR_OPAINTOEN;
+}
 
-END_DECLS
+void opamp_output_set_external(uint32_t base)
+{
+	OPAMP_CSR(base) &= ~OPAMP_CSR_OPAINTOEN;
+}
+
+/**@}*/

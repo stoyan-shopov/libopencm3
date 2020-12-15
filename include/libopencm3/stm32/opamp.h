@@ -22,6 +22,8 @@
 
 #if defined(STM32F3)
 #       include <libopencm3/stm32/f3/opamp.h>
+#elif defined(STM32G4)
+#       include <libopencm3/stm32/g4/opamp.h>
 #else
 #       error "stm32 family not defined."
 #endif

@@ -1,22 +1,16 @@
-/** @defgroup timer_defines Timer Defines
-
-@brief <b>libopencm3 Defined Constants and Types for the STM32F1xx Timers</b>
-
-@ingroup STM32F1xx_defines
-
-@version 1.0.0
-
-@date 8 March 2013
-
-@author @htmlonly &copy; @endhtmlonly 2011 Fergus Noble <fergusnoble@gmail.com>
-
-LGPL License Terms @ref lgpl_license
-*/
+/** @defgroup spi_defines SPI Defines
+ *
+ * @brief <b>Defined Constants and Types for the STM32G4xx SPI</b>
+ *
+ * @ingroup STM32G4xx_defines
+ *
+ * @version 1.0.0
+ *
+ * LGPL License Terms @ref lgpl_license
+ */
 
 /*
  * This file is part of the libopencm3 project.
- *
- * Copyright (C) 2011 Fergus Noble <fergusnoble@gmail.com>
  *
  * This library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -32,22 +26,9 @@ LGPL License Terms @ref lgpl_license
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef LIBOPENCM3_SPI_H
+#define LIBOPENCM3_SPI_H
 
-#include <libopencm3/stm32/common/timer_common_all.h>
+#include <libopencm3/stm32/common/spi_common_v2.h>
 
-/** Input Capture input polarity */
-enum tim_ic_pol {
-	TIM_IC_RISING,
-	TIM_IC_FALLING,
-};
-
-/* --- Function prototypes ------------------------------------------------- */
-
-BEGIN_DECLS
-
-void timer_ic_set_polarity(uint32_t timer,
-			   enum tim_ic_id ic,
-			   enum tim_ic_pol pol);
-
-END_DECLS
+#endif

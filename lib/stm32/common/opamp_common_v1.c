@@ -1,4 +1,4 @@
-/** @addtogroup flash_file FLASH peripheral API
+/** @addtogroup opamp_file OPAMP peripheral API
  * @ingroup peripheral_apis
  */
 
@@ -21,32 +21,36 @@
 
 /**@{*/
 
-#include <libopencm3/stm32/flash.h>
+#include <libopencm3/stm32/opamp.h>
 
-void flash_prefetch_enable(void)
+bool opamp_read_outcal(uint32_t base)
 {
-	FLASH_ACR |= FLASH_ACR_PRFTEN;
+	return (OPAMP_CSR(base) >> OPAMP_CSR_OUTCAL_SHIFT)
+		& OPAMP_CSR_OUTCAL_MASK;
 }
 
-void flash_prefetch_disable(void)
+void opamp_tcm_enable(uint32_t base)
 {
-	FLASH_ACR &= ~FLASH_ACR_PRFTEN;
+	OPAMP_CSR(base) |= OPAMP_CSR_TCM_EN;
 }
 
-void flash_set_ws(uint32_t ws)
+void opamp_tcm_disable(uint32_t base)
 {
-	uint32_t reg32;
-
-	reg32 = FLASH_ACR;
-	reg32 &= ~(FLASH_ACR_LATENCY_MASK << FLASH_ACR_LATENCY_SHIFT);
-	reg32 |= (ws << FLASH_ACR_LATENCY_SHIFT);
-	FLASH_ACR = reg32;
+	OPAMP_CSR(base) &= ~OPAMP_CSR_TCM_EN;
 }
 
-void flash_unlock_option_bytes(void)
+void opamp_vps_select(uint32_t base, uint32_t vps)
 {
-	FLASH_OPTKEYR = FLASH_OPTKEYR_KEY1;
-	FLASH_OPTKEYR = FLASH_OPTKEYR_KEY2;
+	OPAMP_CSR(base) &= ~(OPAMP_CSR_VPS_SEL_MASK
+		<< OPAMP_CSR_VPS_SEL_SHIFT);
+	OPAMP_CSR(base) |= vps << OPAMP_CSR_VPS_SEL_SHIFT;
+}
+
+void opamp_vms_select(uint32_t base, uint32_t vms)
+{
+	OPAMP_CSR(base) &= ~(OPAMP_CSR_VMS_SEL_MASK
+		<< OPAMP_CSR_VMS_SEL_SHIFT);
+	OPAMP_CSR(base) |= vms << OPAMP_CSR_VMS_SEL_SHIFT;
 }
 
 /**@}*/
